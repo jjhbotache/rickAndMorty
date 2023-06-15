@@ -6,8 +6,8 @@ import './App.css';
 // import characterCard component
 
 import CharacterCard from './components/CharacterCard';
-import Filter from './components/Filter/Filter';
-import { type Character } from './models/interfaces';
+import { type APIResponse, type Character } from './models/interfaces';
+import { type Filter } from './models/interfaces';
 
 const apiRoute = `https://rickandmortyapi.com/api/character`;
 // create an url obj
@@ -22,57 +22,83 @@ const apiRoute = `https://rickandmortyapi.com/api/character`;
 
 function App() {
 
-  const [characters,setCharacters] = useState<Character[]>([])
-  const [load,setLoad] = useState<number>(1)
-  const [searched,setSearched] = useState<string>("")
-  const [nextUrlSearched,setNextUrlSearched] = useState<string>()
-  // const [filtered,setFiltered] = useState<string[]>()
+  const [response,setResponse] = useState<APIResponse>()
+  const [nextUrl,setNextUrl] = useState<string | null>(null)
 
+  const [characters,setCharacters] = useState<Character[]>([])
+
+  const [filter,setFilter] = useState<Filter>()
+
+  useEffect(
+    // when it gets the final of the page,
+    // it will load the next page
+    ()=>{
+      fetch(apiRoute).then((re)=>re.json()).then((value) => {
+        setResponse(value)
+      })      
+    }
+    ,
+  [])
+  
+  useEffect(
+    ()=>{
+      if (response){
+        console.log(response);
+        if (response.results) {
+          setCharacters([...characters,...response.results])
+        }
+        window.addEventListener('scroll',()=>{
+          if(window.scrollY + window.innerHeight >= document.body.scrollHeight -100){
+            console.log("end of page");
+            console.log(response);
+            setNextUrl(response.info.next)
+          }
+        })
+      }
+      return ()=>{
+        window.removeEventListener('scroll',()=>{})
+        setCharacters([])
+      }
+    }
+    ,
+  [response])
+
+  useEffect(
+   ()=>{
+    if(nextUrl){
+      fetch(nextUrl).then(re=>re.json()).then((value) => {
+        setResponse(value)
+      })
+    }
+   } 
+  ,[nextUrl])
 
   useEffect(
     ()=>{
-      
-      document.addEventListener('scroll', ()=>{
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight-100) {
-          setLoad((load) => load+1)
-          console.log(load);
+      if(filter){
+        let url = new URL(apiRoute)
+        if(filter.name){
+          url.searchParams.append("name",filter.name)
         }
-      })
-      return(
-        document.removeEventListener('scroll',()=>{
-          console.log("removed");
-        })
-      )
-
-    },
-    []
-  )
-
-  useEffect(()=>{
-    // add a parameter to the url
-    if (searched==="") {
-      const url = new URL(apiRoute);
-      url.searchParams.set("page",load.toString())
-      console.log(url);
-      
-      fetch(url).then((response)=>response.json()).then((value) => {
-        console.log(value);
-        const finalList: Character[]= [...characters,...value.results]
-        setCharacters(finalList)
-      })
-    }else{
-      if (nextUrlSearched) {
-        const url = new URL(nextUrlSearched);
-        fetch(url).then((response)=>response.json()).then((value) => {
-          console.log(value);
-          const finalList: Character[]= [...characters,...value.results]
-          setCharacters(finalList)
-          setNextUrlSearched(value.info.next)
+        if(filter.status){
+          url.searchParams.append("status",filter.status)
+        }
+        if(filter.species){
+          url.searchParams.append("species",filter.species)
+        }
+        if(filter.gender){
+          url.searchParams.append("gender",filter.gender)
+        }
+        fetch(url).then(re=>re.json()).then((value) => {
+        setCharacters([])
+        setResponse(value)
         })
       }
-    }
-    
-  },[load])
+    },
+  [filter])
+
+  
+
 
 
 //   name: filter by the given name.
@@ -82,25 +108,6 @@ function App() {
 // gender: filter by the given gender (female, male, genderless or unknown).
 
 
-    
-  useEffect(()=>{
-    if(searched){
-      const url = new URL(apiRoute);
-      url.searchParams.set("name",searched)
-      console.log(url);
-
-      fetch(url).then((response)=>response.json()).then((value) => {
-        console.log(value);
-        const finalList: Character[]= [...value.results]
-        setCharacters(finalList)
-        setNextUrlSearched(value.info.next)
-      })
-    }
-    return(
-      setLoad(1),
-      setCharacters([])
-    )
-  },[searched])
 
 
 
@@ -109,19 +116,20 @@ function App() {
 
     {/* search bar */}
     <div className="input-group rounded">
-      <input type="text" className="form-control" placeholder="Search" onChange={(e)=>{setSearched(e.target.value)}} />
-      <button type="button" className="btn btn-primary" onClick={()=>{setLoad(Math.floor(Math.random() * 42) + 1)}} ><i className="fi fi-br-search"></i></button>
+      <input type="text" className="form-control" placeholder="Search" onChange={(e)=>{setFilter({...filter,name:e.target.value})}} />
     </div>
 
     {/* filter */}
     <div className="btn-group">
       <button className="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true"
           aria-expanded="false">
-            Filter
+            <i className="fi fi-rr-settings-sliders"></i>
       </button>
       <div className="dropdown-menu dropdown-menu-start" aria-labelledby="triggerId">
       <div className="col">
-          <select id="statusFilter" className="form-control">
+          <select id="statusFilter" className="form-control" onChange={(e)=>{
+            setFilter({...filter,status:e.target.value})
+          }}>
             <option value="">All Statuses</option>
             <option value="alive">Alive</option>
             <option value="dead">Dead</option>
@@ -129,7 +137,12 @@ function App() {
           </select>
         </div>
         <div className="col">
-          <select id="speciesFilter" className="form-control">
+          <select id="speciesFilter" className="form-control" onChange={
+            (e)=>{
+              setFilter({...filter,species:e.target.value})
+            }
+
+          }>
             <option value="">All Species</option>
             <option value="Human">Human</option>
             <option value="Alien">Alien</option>
@@ -137,15 +150,11 @@ function App() {
           </select>
         </div>
         <div className="col">
-          <select id="typeFilter" className="form-control">
-            <option value="">All Types</option>
-            <option value="Type 1">Type 1</option>
-            <option value="Type 2">Type 2</option>
-            
-          </select>
-        </div>
-        <div className="col">
-          <select id="genderFilter" className="form-control">
+          <select id="genderFilter" className="form-control" onChange={
+            (e)=>{
+              setFilter({...filter,gender:e.target.value})
+            }
+          }>
             <option value="">All Genders</option>
             <option value="female">Female</option>
             <option value="male">Male</option>
@@ -160,7 +169,7 @@ function App() {
     <div className="container-fluid">
       <div className="row g-3">
         {
-          characters.length>0 &&( characters.map((character:Character) => {
+          (characters.length>0) && (characters.map((character:Character) => {
             return <CharacterCard key={character.id} character={character}></CharacterCard>
           }))
         }

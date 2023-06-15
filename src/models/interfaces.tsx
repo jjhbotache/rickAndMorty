@@ -18,3 +18,20 @@ export interface Character {
   url: string;
   created: string;
 }
+
+export interface Filter{
+  name?: string;
+  status?: string;
+  species?: string;
+  gender?: string;
+}
+
+export interface APIResponse {
+  info: {
+    count: number;
+    pages: number;
+    next: string | null;
+    prev: string | null;
+  };
+  results: Character[];
+}
