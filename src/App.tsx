@@ -63,10 +63,15 @@ function App() {
           :[]
         )
         window.addEventListener('scroll',()=>{
-          if(window.scrollY + window.innerHeight >= document.body.scrollHeight -100){
+          if(window.scrollY + window.innerHeight >= document.body.scrollHeight - 700){
             console.log("end of page");
             console.log(response);
-            setNextUrl(response.info.next)
+            try {
+              setNextUrl(response.info.next)
+            } catch (error) {
+              console.log("there aren't more pages");
+              
+            }
           }
         })
       }else{
@@ -84,7 +89,7 @@ function App() {
   useEffect(
    ()=>{
     if(nextUrl){
-      setSearching(true)
+      // setSearching(true)
       fetch(nextUrl).then(re=>re.json()).then((value) => {
         setResponse(value)
       })
