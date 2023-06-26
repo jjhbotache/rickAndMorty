@@ -4,9 +4,10 @@
 import { useEffect, useState } from 'react';
 // import characterCard component
 
-import CharacterCard from './components/CharacterCard';
+import CharacterCard from './components/CharacterCard/CharacterCard';
 import { type APIResponse, type Character } from './models/interfaces';
 import { type Filter } from './models/interfaces';
+import FilterComponent from './components/FilterComponent/FilterComponent';
 
 const apiRoute = `https://rickandmortyapi.com/api/character`;
 
@@ -19,8 +20,14 @@ function App() {
   const [searching,setSearching] = useState(false)
 
 
+  
   let filter:Filter;
-  function filterCharacter() {
+  function onFilter(newfilter:Filter):void {
+    // filter will be the older plus the new one
+    
+    filter={...filter,...newfilter}
+
+
     let url = new URL(apiRoute)
         // to do: optimize
     if(filter.name){
@@ -112,85 +119,30 @@ function App() {
 
 // bug display in just one (alive human unknow) .✔️
 // bug display bar no static✔️
-// missing spinner
+// missing spinner ✔️
+// bigger spinner
 // missing space between cards✔️
-// better design for the filter✔️
+// better design for the filter
 // del useEffect and its ifs
+// separate components filter/search bar
+
 
 
   return (
     <>
 
     {/* search bar */}
-    <div className="container-fluid" style={
-
-      {
-        background:"#222"
-      }
-    }>
-      <div className="row rounded"  style={
-        {
+    <div className="container-fluid" style={{background:"#222"}}>
+      <div className="row rounded"  style={{
           position:"sticky",
           top:0,
           paddingTop:"1em",
           zIndex:1000,
           backgroundColor:"#222"
-        }
-      }>
-        <input type="text" className="form-control " placeholder="Search" onChange={(e)=>{
-          filter = {...filter,name:e.target.value};
-          filterCharacter()
-          }} />
-
-    {/* filter */}
-        <div className="btn-group my-2">
-        <button className="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true"
-            aria-expanded="false">
-              <i className="fi fi-rr-settings-sliders"></i>
-        </button>
-        <div className="dropdown-menu dropdown-menu-start" aria-labelledby="triggerId">
-          <div className="col">
-            <select id="statusFilter" className="form-control" onChange={(e)=>{
-              filter={...filter,status:e.target.value};
-              filterCharacter() 
-            }}>
-              <option value="">All Statuses</option>
-              <option value="alive">Alive</option>
-              <option value="dead">Dead</option>
-              <option value="unknown">Unknown</option>
-            </select>
-          </div>
-          <div className="col">
-            <select id="speciesFilter" className="form-control" onChange={
-              (e)=>{
-                filter = {...filter,species:e.target.value};
-                filterCharacter()
-              }
-
-            }>
-              <option value="">All Species</option>
-              <option value="Human">Human</option>
-              <option value="Alien">Alien</option>
-              
-            </select>
-          </div>
-          <div className="col">
-            <select id="genderFilter" className="form-control" onChange={
-              (e)=>{
-                filter = {...filter,gender:e.target.value};
-                filterCharacter()
-              }
-            }>
-              <option value="">All Genders</option>
-              <option value="female">Female</option>
-              <option value="male">Male</option>
-              <option value="genderless">Genderless</option>
-              <option value="unknown">Unknown</option>
-            </select>
-          </div>
-        </div>
+        }}>
+        <FilterComponent onFilterFunction={onFilter} filter={filter}></FilterComponent>
+        
       </div>
-      </div>  
     {/* characters */}
       <div className="container-fluid ">
         <div className="row g-3 justify-content-around pt-2">

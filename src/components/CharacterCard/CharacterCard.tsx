@@ -1,4 +1,4 @@
-import { type Character } from "../models/interfaces";
+import { type Character } from "../../models/interfaces";
 
 interface CharacterCardProps {
   character: Character;
