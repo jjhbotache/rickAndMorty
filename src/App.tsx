@@ -21,8 +21,8 @@ function App() {
 
 
   
-  let filter:Filter;
-  function onFilter(newfilter:Filter):void {
+  let filter:Filter = {};
+  function onFilter(newfilter:Filter){
     // filter will be the older plus the new one
     
     filter={...filter,...newfilter}
@@ -140,7 +140,7 @@ function App() {
           zIndex:1000,
           backgroundColor:"#222"
         }}>
-        <FilterComponent onFilterFunction={onFilter} filter={filter}></FilterComponent>
+        <FilterComponent onFilterFunction={onFilter}/>
         
       </div>
     {/* characters */}

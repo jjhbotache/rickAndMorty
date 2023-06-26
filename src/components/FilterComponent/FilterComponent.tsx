@@ -1,10 +1,9 @@
 import { Filter } from '../../models/interfaces';
 import './FilterComponent.css';
 interface FilterProps{
-  onFilterFunction:void,
-  filter:Filter
+  onFilterFunction:(newfilter: Filter) => void,
 }
-function FilterComponent({onFilterFunction,filter}:FilterProps):JSX.Element{
+function FilterComponent({onFilterFunction}:FilterProps):JSX.Element{
   return(
   <>
   {/* search bar */}
@@ -13,14 +12,16 @@ function FilterComponent({onFilterFunction,filter}:FilterProps):JSX.Element{
   />
   {/* filters */}
   <div className="btn-group my-2">
-        <button className="btn btn-secondary dropdown-toggle" type="button" id="triggerId" data-bs-toggle="dropdown" aria-haspopup="true"
+        <button className="btn btn-secondary dropdown-toggle" type="button" id="filterElementId" data-bs-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false">
               <i className="fi fi-rr-settings-sliders"></i>
         </button>
-        <div className="dropdown-menu dropdown-menu-start" aria-labelledby="triggerId">
+        <div className="dropdown-menu dropdown-menu-dark d-flex flex-column justify-content-between p-0" aria-labelledby="filterElementId">
           <div className="col">
             <select id="statusFilter" className="form-control" 
-            onChange={(e)=>{onFilterFunction({status: e.target.value})}}
+            onChange={(e)=>{
+              onFilterFunction({status: e.target.value})
+            }}
             >
               <option value="">All Statuses</option>
               <option value="alive">Alive</option>
@@ -30,7 +31,12 @@ function FilterComponent({onFilterFunction,filter}:FilterProps):JSX.Element{
           </div>
           <div className="col">
             <select id="speciesFilter" className="form-control" 
-            onChange={(e)=>{onFilterFunction({species:e.target.value})}}
+            onChange={(e)=>{
+              // close the select
+              
+              
+              onFilterFunction({species:e.target.value})
+            }}
             >
               <option value="">All Species</option>
               <option value="Human">Human</option>
@@ -40,7 +46,12 @@ function FilterComponent({onFilterFunction,filter}:FilterProps):JSX.Element{
           </div>
           <div className="col">
             <select id="genderFilter" className="form-control" 
-            onChange={(e)=>{onFilterFunction({gender:e.target.value})}}
+            onChange={(e)=>{
+              // close the select
+              
+              
+              onFilterFunction({gender:e.target.value})
+            }}
             >
               <option value="">All Genders</option>
               <option value="female">Female</option>

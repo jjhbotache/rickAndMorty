@@ -1,3 +1,7 @@
 h1{
   color: white;
 }
+select{
+  background: #222 !important;
+  color: white !important;
+}
