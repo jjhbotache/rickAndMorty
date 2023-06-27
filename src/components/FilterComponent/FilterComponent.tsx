@@ -1,9 +1,23 @@
 import { Filter } from '../../models/interfaces';
 import './FilterComponent.css';
+interface toFilterInterface{
+  [key:string]:string[],
+}
 interface FilterProps{
   onFilterFunction:(newfilter: Filter) => void,
+  toFilter:toFilterInterface
 }
-function FilterComponent({onFilterFunction}:FilterProps):JSX.Element{
+
+function FilterComponent({onFilterFunction,toFilter}:FilterProps):JSX.Element{
+
+
+  
+
+  // convert the first letter of a string to uppercase
+  function capitalizeFirstLetter(string:string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+  }
+
   return(
   <>
   {/* search bar */}
@@ -16,50 +30,20 @@ function FilterComponent({onFilterFunction}:FilterProps):JSX.Element{
             aria-expanded="false">
               <i className="fi fi-rr-settings-sliders"></i>
         </button>
-        <div className="dropdown-menu dropdown-menu-dark d-flex flex-column justify-content-between p-0" aria-labelledby="filterElementId">
-          <div className="col">
-            <select id="statusFilter" className="form-control" 
-            onChange={(e)=>{
-              onFilterFunction({status: e.target.value})
-            }}
-            >
-              <option value="">All Statuses</option>
-              <option value="alive">Alive</option>
-              <option value="dead">Dead</option>
-              <option value="unknown">Unknown</option>
-            </select>
-          </div>
-          <div className="col">
-            <select id="speciesFilter" className="form-control" 
-            onChange={(e)=>{
-              // close the select
-              
-              
-              onFilterFunction({species:e.target.value})
-            }}
-            >
-              <option value="">All Species</option>
-              <option value="Human">Human</option>
-              <option value="Alien">Alien</option>
-              
-            </select>
-          </div>
-          <div className="col">
-            <select id="genderFilter" className="form-control" 
-            onChange={(e)=>{
-              // close the select
-              
-              
-              onFilterFunction({gender:e.target.value})
-            }}
-            >
-              <option value="">All Genders</option>
-              <option value="female">Female</option>
-              <option value="male">Male</option>
-              <option value="genderless">Genderless</option>
-              <option value="unknown">Unknown</option>
-            </select>
-          </div>
+        <div className="dropdown-menu dropdown-menu-dark p-0" aria-labelledby="filterElementId">
+          {
+            Object.keys(toFilter).map((key)=>{
+              return (
+                <div className="col" key={key}>
+                  <select className="form-control" onChange={(e)=>{onFilterFunction({[key]:e.target.value})}} >
+                    <option value="">All {capitalizeFirstLetter(key)}</option>
+                    {toFilter[key].map(element=><option value={element} key={element}>{capitalizeFirstLetter(element)}</option>)}
+                  </select>
+                </div>
+              )
+            }
+            )
+          }         
         </div>
   </div>
 

@@ -22,6 +22,25 @@ function App() {
 
   
   let filter:Filter = {};
+  const filterThings = {
+    status : [
+      "alive",
+      "dead",
+      "unknown"
+    ],
+    species:[
+      "human",
+      "alien",
+      "humanoid",
+      "unknown"
+    ],
+    gender:[
+      "male",
+      "female",
+      "genderless",
+      "unknown"
+    ]
+  }
   function onFilter(newfilter:Filter){
     // filter will be the older plus the new one
     
@@ -127,21 +146,20 @@ function App() {
 // separate components filter/search bar
 
 
-
   return (
     <>
 
     {/* search bar */}
     <div className="container-fluid" style={{background:"#222"}}>
-      <div className="row rounded"  style={{
+      <div className="row rounded"  
+        style={{
           position:"sticky",
           top:0,
           paddingTop:"1em",
           zIndex:1000,
           backgroundColor:"#222"
         }}>
-        <FilterComponent onFilterFunction={onFilter}/>
-        
+        <FilterComponent onFilterFunction={onFilter} toFilter={filterThings}/>        
       </div>
     {/* characters */}
       <div className="container-fluid ">
