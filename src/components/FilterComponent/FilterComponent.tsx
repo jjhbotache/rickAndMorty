@@ -1,17 +1,15 @@
 import { Filter } from '../../models/interfaces';
 import './FilterComponent.css';
-interface toFilterInterface{
-  [key:string]:string[],
-}
+
 interface FilterProps{
   onFilterFunction:(newfilter: Filter) => void,
-  toFilter:toFilterInterface
+  toFilter:{
+    filterName:string,
+    subFilter:string[]
+  }[]
 }
 
 function FilterComponent({onFilterFunction,toFilter}:FilterProps):JSX.Element{
-
-
-  
 
   // convert the first letter of a string to uppercase
   function capitalizeFirstLetter(string:string) {
@@ -32,12 +30,12 @@ function FilterComponent({onFilterFunction,toFilter}:FilterProps):JSX.Element{
         </button>
         <div className="dropdown-menu dropdown-menu-dark p-0" aria-labelledby="filterElementId">
           {
-            Object.keys(toFilter).map((key)=>{
+            toFilter.map((item)=>{
               return (
-                <div className="col" key={key}>
-                  <select className="form-control" onChange={(e)=>{onFilterFunction({[key]:e.target.value})}} >
-                    <option value="">All {capitalizeFirstLetter(key)}</option>
-                    {toFilter[key].map(element=><option value={element} key={element}>{capitalizeFirstLetter(element)}</option>)}
+                <div className="col" key={item.filterName}>
+                  <select className="form-control" onChange={(e)=>{onFilterFunction({[item.filterName]:e.target.value})}} >
+                    <option value="">All {capitalizeFirstLetter(item.filterName)}</option>
+                    {item.subFilter.map(element=><option value={element} key={element}>{capitalizeFirstLetter(element)}</option>)}
                   </select>
                 </div>
               )

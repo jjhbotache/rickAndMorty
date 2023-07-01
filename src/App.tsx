@@ -10,6 +10,7 @@ import { type Filter } from './models/interfaces';
 import FilterComponent from './components/FilterComponent/FilterComponent';
 
 const apiRoute = `https://rickandmortyapi.com/api/character`;
+let filter:Filter = {};
 
 
 function App() {
@@ -21,30 +22,42 @@ function App() {
 
 
   
-  let filter:Filter = {};
-  const filterThings = {
-    status : [
-      "alive",
-      "dead",
-      "unknown"
-    ],
-    species:[
-      "human",
-      "alien",
-      "humanoid",
-      "unknown"
-    ],
-    gender:[
-      "male",
-      "female",
-      "genderless",
-      "unknown"
-    ]
-  }
+  const filterThings = [
+    {
+      filterName: "status",
+      subFilter: [
+        "alive",
+        "dead",
+        "unknown"
+      ]
+    },
+    {
+      filterName: "species",
+      subFilter: [
+        "human",
+        "alien",
+        "humanoid",
+        "unknown"
+      ]
+    },
+    {
+      filterName: "gender",
+      subFilter: [
+        "male",
+        "female",
+        "genderless",
+        "unknown"
+      ]
+    }
+  ];
+  
   function onFilter(newfilter:Filter){
     // filter will be the older plus the new one
     
+    console.log(filter,newfilter);
     filter={...filter,...newfilter}
+    console.log(filter);
+    
 
 
     let url = new URL(apiRoute)
@@ -159,7 +172,9 @@ function App() {
           zIndex:1000,
           backgroundColor:"#222"
         }}>
+
         <FilterComponent onFilterFunction={onFilter} toFilter={filterThings}/>        
+
       </div>
     {/* characters */}
       <div className="container-fluid ">
@@ -171,14 +186,15 @@ function App() {
               return <CharacterCard key={character.id} character={character}></CharacterCard>
                 }))
               :
+              // no characters found
               <div className="d-flex justify-content-center align-items-center">
                 <h1 className="text-center text-muted">No Characters Found</h1>
               </div>
             :(
+              // spinner
               <div className="d-flex justify-content-center align-items-center">
                 <div className="spinner-border text-primary spinner-border-sm"
                   role="status">
-                  <span className="visually-hidden">Loading...</span>
                 </div>
               </div>
             )
