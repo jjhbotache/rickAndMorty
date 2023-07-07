@@ -1,3 +1,4 @@
+import React from "react"
 import { Filter } from '../../models/interfaces';
 import './FilterComponent.css';
 
@@ -17,13 +18,7 @@ function FilterComponent({onFilterFunction,toFilter}:FilterProps):JSX.Element{
   }
 
   return(
-  <div className='d-flex justify-content-around flex-column ' style={{
-    position:"sticky",
-    top:0,
-    paddingTop:"1em",
-    zIndex:1000,
-    backgroundColor:"#222"
-  }}>
+  <>
   {/* search bar */}
   <input type="text" className="form-control " placeholder="Search" 
   onChange={(e)=>{onFilterFunction({name:e.target.value})}}
@@ -52,7 +47,7 @@ function FilterComponent({onFilterFunction,toFilter}:FilterProps):JSX.Element{
   </div>
 
   
-  </div>
+  </>
   )
 }
 

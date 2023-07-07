@@ -1,16 +1,17 @@
 // import { useState } from 'react'
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 // import characterCard component
 
 import CharacterCard from './components/CharacterCard/CharacterCard';
 import { type APIResponse, type Character } from './models/interfaces';
 import { type Filter } from './models/interfaces';
 import FilterComponent from './components/FilterComponent/FilterComponent';
+import Spinner from './components/Spinner/Spinner';
+import Cards from './components/Cards/Cards';
 
 const apiRoute = `https://rickandmortyapi.com/api/character`;
-let filter:Filter = {};
 
 
 function App() {
@@ -50,29 +51,30 @@ function App() {
       ]
     }
   ];
+
+  const filter = useRef<Filter>({})
   
   function onFilter(newfilter:Filter){
     // filter will be the older plus the new one
     
-    console.log(filter,newfilter);
-    filter={...filter,...newfilter}
-    console.log(filter);
+    filter.current={...filter.current,...newfilter}
+    // console.log(filter.current);
     
 
 
     let url = new URL(apiRoute)
         // to do: optimize
-    if(filter.name){
-      url.searchParams.append("name",filter.name)
+    if(filter.current.name){
+      url.searchParams.append("name",filter.current.name)
     }
-    if(filter.status){
-      url.searchParams.append("status",filter.status)
+    if(filter.current.status){
+      url.searchParams.append("status",filter.current.status)
     }
-    if(filter.species){
-      url.searchParams.append("species",filter.species)
+    if(filter.current.species){
+      url.searchParams.append("species",filter.current.species)
     }
-    if(filter.gender){
-      url.searchParams.append("gender",filter.gender)
+    if(filter.current.gender){
+      url.searchParams.append("gender",filter.current.gender)
     }
     setSearching(true)
     fetch(url).then(re=>re.json()).then((value) => {
@@ -154,52 +156,19 @@ function App() {
 // missing spinner ✔️
 // bigger spinner
 // missing space between cards✔️
-// better design for the filter
-// del useEffect and its ifs
-// separate components filter/search bar
+// separate components filter/search bar✔️
 
 
   return (
     <>
 
-    {/* search bar */}
-    <div className="container-fluid" style={{background:"#222"}}>
-      <div className="row rounded"  
-        style={{
-          position:"sticky",
-          top:0,
-          paddingTop:"1em",
-          zIndex:1000,
-          backgroundColor:"#222"
-        }}>
 
-        <FilterComponent onFilterFunction={onFilter} toFilter={filterThings}/>        
-
-      </div>
-    {/* characters */}
-      <div className="container-fluid ">
-        <div className="row g-3 justify-content-around pt-2">
-          {
-            !searching
-            ?(characters.length>0) 
-              ? (characters.map((character:Character) => {
-              return <CharacterCard key={character.id} character={character}></CharacterCard>
-                }))
-              :
-              // no characters found
-              <div className="d-flex justify-content-center align-items-center">
-                <h1 className="text-center text-muted">No Characters Found</h1>
-              </div>
-            :(
-              // spinner
-              <div className="d-flex justify-content-center align-items-center">
-                <div className="spinner-border text-primary spinner-border-sm"
-                  role="status">
-                </div>
-              </div>
-            )
-          }
-        </div>
+    <div className="container-fluid ">
+      <FilterComponent onFilterFunction={onFilter} toFilter={filterThings}/>        
+      <div className="row g-3 justify-content-around pt-2">
+          <Spinner show={searching}>
+              <Cards characters={characters} />
+          </Spinner>
       </div>
     </div>
     </>
