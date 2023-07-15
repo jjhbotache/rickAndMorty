@@ -2,16 +2,16 @@
 // import reactLogo from './assets/react.svg'
 // import viteLogo from '/vite.svg'
 import { useEffect, useRef, useState } from 'react';
-// import characterCard component
 
-import CharacterCard from './components/CharacterCard/CharacterCard';
+// import CharacterCard from './components/CharacterCard/CharacterCard';
 import { type APIResponse, type Character } from './models/interfaces';
 import { type Filter } from './models/interfaces';
 import FilterComponent from './components/FilterComponent/FilterComponent';
 import Spinner from './components/Spinner/Spinner';
 import Cards from './components/Cards/Cards';
+import { apiRoute } from './const/const';
+import useFilter from './hooks/useFilter';
 
-const apiRoute = `https://rickandmortyapi.com/api/character`;
 
 
 function App() {
@@ -20,6 +20,8 @@ function App() {
   const [nextUrl,setNextUrl] = useState<string | null>(null)
   const [characters,setCharacters] = useState<Character[]>([])
   const [searching,setSearching] = useState(false)
+  const {filteredFetch} = useFilter()
+
 
 
   
@@ -52,35 +54,19 @@ function App() {
     }
   ];
 
-  const filter = useRef<Filter>({})
+  
+  
+ 
+ 
   
   function onFilter(newfilter:Filter){
-    // filter will be the older plus the new one
-    
-    filter.current={...filter.current,...newfilter}
-    // console.log(filter.current);
-    
-
-
-    let url = new URL(apiRoute)
-        // to do: optimize
-    if(filter.current.name){
-      url.searchParams.append("name",filter.current.name)
-    }
-    if(filter.current.status){
-      url.searchParams.append("status",filter.current.status)
-    }
-    if(filter.current.species){
-      url.searchParams.append("species",filter.current.species)
-    }
-    if(filter.current.gender){
-      url.searchParams.append("gender",filter.current.gender)
-    }
     setSearching(true)
-    fetch(url).then(re=>re.json()).then((value) => {
+    filteredFetch(newfilter).then((value) => {
       setCharacters([])
       setResponse(value)
-    })
+    }).finally(
+      ()=>setSearching(false)
+    )
   }
 
   useEffect(
@@ -162,13 +148,14 @@ function App() {
   return (
     <>
 
-
     <div className="container-fluid ">
       <FilterComponent onFilterFunction={onFilter} toFilter={filterThings}/>        
       <div className="row g-3 justify-content-around pt-2">
-          <Spinner show={searching}>
-              <Cards characters={characters} />
-          </Spinner>
+          {
+            searching
+            ?<Spinner/>
+            :<Cards characters={characters} />
+          }
       </div>
     </div>
     </>
